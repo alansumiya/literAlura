@@ -26,6 +26,10 @@ public class Autor {
         this.dataFalecimento = dadosAutor.dataFalecimento();
     }
 
+    public void adicionarLivro(Livro livro){
+        this.livros.add(livro);
+        livro.setAutor(this);
+    }
     public Long getId() {
         return id;
     }

@@ -11,9 +11,9 @@ public class Livro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String titulo;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Autor autor;
-    private List<String> idioma;
+    private String idioma;
     private Integer numeroDonwloads;
 
     public Livro(){}
@@ -25,7 +25,7 @@ public class Livro {
         } else {
             this.autor = null;
         }
-        this.idioma = dadosLivro.idiomasApi();
+        this.idioma = dadosLivro.idioma();
         this.numeroDonwloads = dadosLivro.numeroDownloads();
     }
 
@@ -53,11 +53,11 @@ public class Livro {
         this.autor = autor;
     }
 
-    public List<String> getIdioma() {
+    public String getIdioma() {
         return idioma;
     }
 
-    public void setIdioma(List<String> idioma) {
+    public void setIdioma(String idioma) {
         this.idioma = idioma;
     }
 
@@ -72,7 +72,7 @@ public class Livro {
     @Override
     public String toString() {
         String autorNome = (autor != null) ? autor.getNome() : "Desconhecido";
-        String primeiroIdioma = (idioma != null && !idioma.isEmpty()) ? idioma.get(0) : "N/A";
+        String primeiroIdioma = (idioma != null && !idioma.isEmpty()) ? idioma : "N/A";
 
 
         return "Título: '" + titulo + '\'' +
