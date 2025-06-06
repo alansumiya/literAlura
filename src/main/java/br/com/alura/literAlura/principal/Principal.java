@@ -18,11 +18,12 @@ public class Principal {
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados converte = new ConverteDados();
     private final String ENDERECO = "https://gutendex.com/books/?search=";
-
     private Autor autor = null;
     private DadosAutor dadosPrimeiroAutor = null;
-
     private List<Livro> livros = new ArrayList<>();
+    private List<Autor> autores = new ArrayList<>();
+
+
 
     @Autowired
     private LivroRepository livroRepository;
@@ -60,6 +61,12 @@ public class Principal {
                 case 2:
                     listarLivrosRegistrados();
                     break;
+                case 3:
+                    listasAutoresRegistrados();
+                    break;
+                case 4:
+                    listarAutoresVivosDeterminadoAno();
+                    break;
                 case 6:
                     System.out.println("Saindo...");
                     break;
@@ -71,6 +78,7 @@ public class Principal {
         }
 
     }
+
 
     private void buscarLivroWeb() {
         System.out.print("Digite o nome do livro para busca: ");
@@ -106,11 +114,16 @@ public class Principal {
                 autor.adicionarLivro(livro);
             }
             livroRepository.save(livro);
-            imprimirDadosLivro(dadosLivro);
-
+            System.out.println("\n--- DADOS DO LIVRO ENCONTRADO ---");
+            System.out.println("Título: " + dadosLivro.titulo());
+            System.out.println("Autor: " + dadosPrimeiroAutor.nome());
+            System.out.println("Idioma: " + dadosLivro.idioma());
+            System.out.println("Número de Downloads: " + dadosLivro.numeroDownloads());
+            System.out.println("----------------------------------\n");
         } else {
             System.out.println("Livro não encontrado ou sem resultados na API.");
         }
+
     }
 
     private void listarLivrosRegistrados() {
@@ -121,18 +134,36 @@ public class Principal {
         }else {
             System.out.println("\n--- LIVROS REGISTRADOS ---");
             livros.forEach(livro -> System.out.println(livro));
-            System.out.println("----------------------------");
         }
 
     }
 
-    private void imprimirDadosLivro(DadosLivro dadosLivro){
-        System.out.println("\n--- DADOS DO LIVRO ENCONTRADO ---");
-        System.out.println("Título: " + dadosLivro.titulo());
-        System.out.println("Autor: " + dadosPrimeiroAutor.nome());
-        System.out.println("Idioma: " + dadosLivro.idioma());
-        System.out.println("Número de Downloads: " + dadosLivro.numeroDownloads());
-        System.out.println("----------------------------------\n");
+    private void listasAutoresRegistrados() {
+        autores = autorRepository.findAll();
+        if (autores.isEmpty()){
+            System.out.println("\nNão há autores registrados no banco de dados.");
+        }else {
+            System.out.println("\n--- AUTORES REGISTRADOS ---");
+            autores.forEach(autor1 -> System.out.println(autor1));
+        }
     }
+
+    private void listarAutoresVivosDeterminadoAno() {
+        System.out.println("Digite o ano desejado para saber se o(a) autor(a) estava vivo(a): ");
+        var anoReferencia = leitura.nextInt();
+        leitura.nextLine();
+        List<Autor> autoresVivos = autorRepository.autorVivoDeterminadoAno(anoReferencia);
+        if (autoresVivos.isEmpty()){
+            System.out.println("\nNão há autores vivos nesse ano no banco de dados.");
+        }else {
+            System.out.println("\n--- AUTORES VIVOS EM "+ anoReferencia +" ---");
+            autoresVivos.forEach(System.out::println);
+            System.out.println("----------------------------------------------");
+        }
+
+    }
+
+
+
 
 }

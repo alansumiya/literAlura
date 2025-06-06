@@ -75,9 +75,12 @@ public class Livro {
         String primeiroIdioma = (idioma != null && !idioma.isEmpty()) ? idioma : "N/A";
 
 
-        return "Título: '" + titulo + '\'' +
-                ", Autor: '" + autorNome + '\'' +
-                ", Idiomas: '" + primeiroIdioma + '\'' +
-                ", Downloads: " + numeroDonwloads;
+        return "\n----------- LIVRO -----------------"+
+                "\nTítulo: '" + titulo + '\'' +
+                "\nAutor: '" + autorNome + '\'' +
+                "\nIdiomas: '" + primeiroIdioma + '\'' +
+                "\nDownloads: " + numeroDonwloads +
+                "\n----------------------------------" +
+                "\n";
     }
 }

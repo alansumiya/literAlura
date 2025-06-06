@@ -72,10 +72,21 @@ public class Autor {
 
     @Override
     public String toString() {
-        return
-                "nome='" + nome + '\'' +
-                ", dataNascimento=" + dataNascimento +
-                ", dataFalecimento=" + dataFalecimento
-                ;
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n----------- AUTOR ------------");
+        sb.append("\nNome= ").append(nome);
+        sb.append("\nData de Nascimento= ").append(dataNascimento != null ? dataNascimento : "N/A");
+        sb.append("\nData de Falecimento= ").append(dataFalecimento != null ? dataFalecimento : "N/A");
+
+        sb.append("\nLivros: ");
+        if (livros != null && !livros.isEmpty()){
+            for (int i = 0; i < livros.size(); i++) {
+                sb.append("\n - ").append(livros.get(i).getTitulo());
+            }
+        }else {
+            sb.append("Nenhum livro registrado.");
+        }
+        sb.append("\n-----------------------------------");
+        return sb.toString();
     }
 }
