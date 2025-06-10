@@ -8,10 +8,8 @@ import br.com.alura.literAlura.service.ConverteDados;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
+
 @Component
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -32,8 +30,8 @@ public class Principal {
 
 
     public void exibeMenu(){
-        var opcao = 0;
-        while (opcao != 6) {
+        int opcao = -1;
+        while (opcao != 0) {
             var menu = ("""
                     /////////////////////////////////////////////
                     ###                                       ###
@@ -48,7 +46,14 @@ public class Principal {
                     3 - Listar autores registrados
                     4 - Listar autores vivos em um determinado ano
                     5 - Listar livros em um determinado idioma
-                    6 - sair
+                                    EXTRA
+                    6 - Exibir estatísticas de Downloads
+                    7 - TOP 10 dos livros mais baixados
+                    8 - Buscar autor pelo nome
+                    9 - Buscar autor pelo ano de falecimento
+                    
+                    
+                    0 - sair
                     """);
             System.out.println(menu);
             opcao = leitura.nextInt();
@@ -67,7 +72,21 @@ public class Principal {
                 case 4:
                     listarAutoresVivosDeterminadoAno();
                     break;
+                case 5:
+                    listarLivroDeterminadoIdioma();
+                    break;
                 case 6:
+                    exibirEstatisticasDeDownloads();
+                    break;
+                case 7:
+                    top10LivrosMaisBaixados();
+                    break;
+                case 8:
+                    buscarAutorPorNome();
+                    break;
+                case 9:
+                    buscarAutorPelaDataFalecimento()
+                case 0:
                     System.out.println("Saindo...");
                     break;
                 default:
@@ -78,6 +97,7 @@ public class Principal {
         }
 
     }
+
 
 
     private void buscarLivroWeb() {
@@ -149,20 +169,118 @@ public class Principal {
     }
 
     private void listarAutoresVivosDeterminadoAno() {
-        System.out.println("Digite o ano desejado para saber se o(a) autor(a) estava vivo(a): ");
-        var anoReferencia = leitura.nextInt();
-        leitura.nextLine();
-        List<Autor> autoresVivos = autorRepository.autorVivoDeterminadoAno(anoReferencia);
-        if (autoresVivos.isEmpty()){
-            System.out.println("\nNão há autores vivos nesse ano no banco de dados.");
-        }else {
-            System.out.println("\n--- AUTORES VIVOS EM "+ anoReferencia +" ---");
-            autoresVivos.forEach(System.out::println);
-            System.out.println("----------------------------------------------");
+        Integer anoReferencia = null;
+        boolean entradaValida = false;
+
+        while (!entradaValida) {
+            System.out.print("Digite o ano desejado para saber se o(a) autor(a) estava vivo(a): ");
+            try {
+                anoReferencia = leitura.nextInt();
+                leitura.nextLine();
+                if (anoReferencia < 0 || anoReferencia > 2025) {
+                    System.out.println("Ano inválido. Por favor digite um ano entre 0 e 2025");
+                } else {
+                    entradaValida = true;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida! Por favor, digite um ano válido.");
+                leitura.nextLine();
+            }
         }
+            //usando JPQL
+            List<Autor> autoresVivos = autorRepository.autorVivoDeterminadoAno(anoReferencia);
+            //usando derived query
+            //List<Autor> autoresVivos = autorRepository.findByDataNascimentoLessThanEqualAndDataFalecimentoGreaterThanEqualOrDataFalecimentoIsNull(anoReferencia, anoReferencia);
+            if (autoresVivos.isEmpty()) {
+                System.out.println("\nNão há autores vivos nesse ano no banco de dados.");
+            } else {
+                System.out.println("\n--- AUTORES VIVOS EM " + anoReferencia + " ---");
+                autoresVivos.forEach(System.out::println);
+                System.out.println("----------------------------------------------");
+            }
+
 
     }
 
+    private void listarLivroDeterminadoIdioma() {
+        String idioma = null;
+        boolean idiomaValido = false;
+
+        while (!idiomaValido) {
+            System.out.println("\n--- LISTAR LIVROS POR IDIOMA ---");
+            System.out.print("Escolha o idioma (ex: en para inglês, es para espanhol, pt para português): ");
+            idioma = leitura.nextLine().trim().toLowerCase();
+            if (idioma.isEmpty()){
+                System.out.println("O idioma não pode ser vazio. Por favor, digite um código de idioma válido.");
+            } else if (idioma.length() > 2) {
+                System.out.println("Código de idioma inválido. Por favor, use um código de 2 letras (ex: en, es, pt).");
+
+            } else {
+                idiomaValido = true;
+            }
+        }
+        List<Livro> livroIdioma = livroRepository.findByIdioma(idioma);
+        if(livroIdioma.isEmpty()){
+            System.out.println("\nNão há livros registrados para o idioma "+ idioma);
+        }else {
+            System.out.println("\nLIVROS REGISTRADOS NO IDIOMA "+ idioma);
+            livroIdioma.forEach(System.out::println);
+            System.out.println("----------------------------------------------------\n");
+        }
+    }
+
+    private void exibirEstatisticasDeDownloads() {
+        List<Livro> livros = livroRepository.findAll();
+        if (livros.isEmpty()){
+            System.out.println("\nNão há livros registrados para exibir estatísticas.");
+            return;
+        }
+
+        DoubleSummaryStatistics estatisticas = livros.stream()
+                .filter(l -> l.getNumeroDownloads() != null)
+                .mapToDouble(Livro::getNumeroDownloads)
+                .summaryStatistics();
+
+        System.out.println("\n--- ESTATÍSTICAS DE DOWNLOADS ---");
+        System.out.println("Total de livros com downloads registrados: " + estatisticas.getCount());
+        if (estatisticas.getCount() > 0) { // Evitar divisão por zero se não houver downloads
+            System.out.println("Total de downloads: " + estatisticas.getSum());
+            System.out.println("Média de downloads por livro: " + String.format("%.2f", estatisticas.getAverage()));
+            System.out.println("Maior número de downloads: " + estatisticas.getMax());
+            System.out.println("Menor número de downloads: " + estatisticas.getMin());
+        } else {
+            System.out.println("Não há dados de downloads válidos para calcular estatísticas.");
+        }
+        System.out.println("-----------------------------------\n");
+    }
+
+    private void top10LivrosMaisBaixados() {
+        List<Livro> top10Livros = livroRepository.findTop10ByOrderByNumeroDownloadsDesc();
+        System.out.println("\n----------------- TOP 10 MAIS BAIXADOS");
+        top10Livros.forEach(l ->
+                System.out.println(l.getTitulo() + "Número de downloads: " + l.getNumeroDownloads() + "\n"));
+                System.out.println("-----------------------------------------------------------------\n");
+    }
+
+    private void buscarAutorPorNome() {
+        System.out.print("Digite um trecho do nome do autor(a) para busca: ");
+        var nomeAutor = leitura.nextLine();
+
+        List<Autor> procuraAutor = autorRepository.findByNomeContainingIgnoreCase(nomeAutor);
+        if (!procuraAutor.isEmpty()){
+            System.out.println("\n--- AUTORES ENCONTRADOS ---");
+            procuraAutor.forEach(autor -> {
+                System.out.println(autor);
+            });
+        }else {
+            System.out.println("Autor(a) não encontrado(a) com o nome: " + nomeAutor);
+        }
+
+        System.out.println("------------------------------------------------------\n\n");
+    }
+
+    private void buscarAutorPelaDataFalecimento() {
+    }
 
 
 

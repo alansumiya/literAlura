@@ -11,13 +11,6 @@ public record DadosLivro(@JsonAlias("title") String titulo,
                          @JsonAlias("languages") List<String> idiomasApi,
                          @JsonAlias("download_count") Integer numeroDownloads) {
 
-    public DadosLivro(String titulo, List<DadosAutor> autores, List<String> idiomasApi, Integer numeroDownloads) {
-        this.titulo = titulo;
-        this.autores = autores;
-        this.idiomasApi = idiomasApi;
-        this.numeroDownloads = numeroDownloads;
-    }
-
     public String idioma(){
         return (idiomasApi != null && !idiomasApi.isEmpty()) ? idiomasApi.get(0) : "N/A";
     }

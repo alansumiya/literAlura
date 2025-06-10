@@ -2,8 +2,6 @@ package br.com.alura.literAlura.model;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "livros")
 public class Livro {
@@ -14,7 +12,7 @@ public class Livro {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Autor autor;
     private String idioma;
-    private Integer numeroDonwloads;
+    private Integer numeroDownloads;
 
     public Livro(){}
 
@@ -26,7 +24,7 @@ public class Livro {
             this.autor = null;
         }
         this.idioma = dadosLivro.idioma();
-        this.numeroDonwloads = dadosLivro.numeroDownloads();
+        this.numeroDownloads = dadosLivro.numeroDownloads();
     }
 
     public Long getId() {
@@ -61,12 +59,12 @@ public class Livro {
         this.idioma = idioma;
     }
 
-    public Integer getNumeroDonwloads() {
-        return numeroDonwloads;
+    public Integer getNumeroDownloads() {
+        return numeroDownloads;
     }
 
-    public void setNumeroDonwloads(Integer numeroDonwloads) {
-        this.numeroDonwloads = numeroDonwloads;
+    public void setNumeroDownloads(Integer numeroDownloads) {
+        this.numeroDownloads = numeroDownloads;
     }
 
     @Override
@@ -79,7 +77,7 @@ public class Livro {
                 "\nTítulo: '" + titulo + '\'' +
                 "\nAutor: '" + autorNome + '\'' +
                 "\nIdiomas: '" + primeiroIdioma + '\'' +
-                "\nDownloads: " + numeroDonwloads +
+                "\nDownloads: " + numeroDownloads +
                 "\n----------------------------------" +
                 "\n";
     }
