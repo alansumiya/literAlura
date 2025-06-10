@@ -17,4 +17,7 @@ public interface AutorRepository extends JpaRepository<Autor, Long> {
 
     List<Autor> findByNomeContainingIgnoreCase(String nomeAutor);
 
+    @Query("SELECT a FROM Autor a WHERE :anoFalecimento >= a.dataFalecimento AND a.dataFalecimento IS NOT NULL")
+    List<Autor> autoresFalecidosDeterminadoAno(Integer anoFalecimento);
+
 }

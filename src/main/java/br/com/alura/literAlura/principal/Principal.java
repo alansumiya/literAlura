@@ -85,7 +85,8 @@ public class Principal {
                     buscarAutorPorNome();
                     break;
                 case 9:
-                    buscarAutorPelaDataFalecimento()
+                    buscarAutorPelaDataFalecimento();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -280,6 +281,33 @@ public class Principal {
     }
 
     private void buscarAutorPelaDataFalecimento() {
+        Integer anoFalecimento = null;
+        boolean entradaValida = false;
+
+        while (!entradaValida) {
+            System.out.print("Digite o ano desejado para listar autores que já faleceram:  ");
+            try {
+                anoFalecimento = leitura.nextInt();
+                leitura.nextLine();
+                if (anoFalecimento < 0 || anoFalecimento > 2025){
+                    System.out.println("Ano inválido. Por favor, digite um ano entre 0 e 2025");
+                } else {
+                    entradaValida = true;
+                }
+            }catch (InputMismatchException e){
+                System.out.println("Entrada inválida! Por favor, digite um ano válido (somente números inteiros");
+                leitura.nextLine();
+            }
+
+        }
+
+        List<Autor> buscaFalecidos = autorRepository.autoresFalecidosDeterminadoAno(anoFalecimento);
+        if (buscaFalecidos.isEmpty()){
+            System.out.println("\nNão há autores registrados que tenham morrido até o ano "+ anoFalecimento);
+        }
+        System.out.println("\n--- AUTORES MORTOS ATÉ "+ anoFalecimento + " ---");
+        buscaFalecidos.forEach(System.out::println);
+        System.out.println("---------------------------------------------------\n");
     }
 
 
